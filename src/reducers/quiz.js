@@ -1,4 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
+import appleLogo from "../assets/icons/apple.svg";
+import googleLogo from "../assets/icons/google.svg";
+import microsoftLogo from "../assets/icons/microsoft.svg";
+import amazonLogo from "../assets/icons/amazon.svg";
+import jeffBezosImage from "../assets/jeffbezoz.png";
 
 const techTriviaQuestions = [
   {
@@ -29,9 +34,11 @@ const techTriviaQuestions = [
   },
   {
     id: 4,
-    questionText: "Identify the tech company from its logo.",
+    questionText: "Which tech company was founded by this person?",
+    imageURL: jeffBezosImage,
     options: ["Apple", "Google", "Microsoft", "Amazon"],
-    correctAnswerIndex: 1,
+    logoURLs: [appleLogo, googleLogo, microsoftLogo, amazonLogo],
+    correctAnswerIndex: 3,
   },
   {
     id: 5,
@@ -45,7 +52,50 @@ const techTriviaQuestions = [
     ],
     correctAnswerIndex: 1,
   },
-  // Add more tech trivia questions as needed
+  {
+    id: 6,
+    questionText:
+      "What is the name of the version control system widely used in software development to track changes in source code?",
+    options: ["Mercurial", "SVN", "Git", "Perforce"],
+    correctAnswerIndex: 2,
+  },
+  {
+    id: 7,
+    questionText:
+      "Which popular front-end framework is developed by Facebook for building user interfaces?",
+    options: ["Angular", "Vue.js", "React", "Ember.js"],
+    correctAnswerIndex: 2,
+  },
+  {
+    id: 8,
+    questionText:
+      "What does the acronym 'URL' stand for in the context of web development?",
+    options: [
+      "Uniform Resource Locator",
+      "Universal Rendering Language",
+      "User Rights Language",
+      "Unified Reference Language",
+    ],
+    correctAnswerIndex: 0,
+  },
+  {
+    id: 9,
+    questionText:
+      "Who is the inventor of the World Wide Web (WWW) and the HTTP protocol?",
+    options: ["Tim Berners-Lee", "Linus Torvalds", "Larry Page", "Sergey Brin"],
+    correctAnswerIndex: 0,
+  },
+  {
+    id: 10,
+    questionText: "In computer science, what does the acronym 'API' stand for?",
+    options: [
+      "Application Programming Interface",
+      "Advanced Program Integration",
+      "Automated Processing Interface",
+      "Application Process Integration",
+    ],
+    correctAnswerIndex: 0,
+  },
 ];
 
 const initialState = {
@@ -53,6 +103,8 @@ const initialState = {
   answers: [],
   currentQuestionIndex: 0,
   quizOver: false,
+  totalQuestions: techTriviaQuestions.length,
+  score: 0,
 };
 
 export const quiz = createSlice({
@@ -75,25 +127,38 @@ export const quiz = createSlice({
         );
       }
 
+      const isCorrect = question.correctAnswerIndex === answerIndex;
+
       state.answers.push({
         questionId,
         answerIndex,
         question,
         answer: question.options[answerIndex],
-        isCorrect: question.correctAnswerIndex === answerIndex,
+        isCorrect,
       });
+
+      // Update the score based on correctness
+      if (isCorrect) {
+        state.score += 1; // You can adjust the score for correct answers
+      } else {
+        state.score -= 1; // You can adjust the deduction for incorrect answers
+      }
     },
 
     goToNextQuestion: (state) => {
-      state.currentQuestionIndex += 1;
-
-      if (state.currentQuestionIndex === state.questions.length) {
+      if (state.currentQuestionIndex + 1 < state.totalQuestions) {
+        state.currentQuestionIndex += 1;
+      } else {
         state.quizOver = true;
       }
     },
 
-    restart: () => {
-      return initialState;
+    restart: (state) => {
+      return {
+        ...initialState,
+        totalQuestions: state.totalQuestions,
+        quizOver: false,
+      };
     },
   },
 });
