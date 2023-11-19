@@ -42,7 +42,7 @@ const QuizSummary = () => {
         <div className="answer-summary">
           {incorrectAnswers.map((answer) => (
             <div key={answer.question.id} className="question-summary">
-              <p>
+              <p className="paragraph-summary">
                 Question: {answer.question.questionText}
                 <br />
                 Your Answer:{" "}

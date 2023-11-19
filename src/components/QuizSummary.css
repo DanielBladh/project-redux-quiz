@@ -36,3 +36,12 @@ p {
   background-color: #007bff;
   color: #fff;
 }
+
+@media screen and (max-width: 600px) {
+  .summary-container {
+    max-width: 300px;
+  }
+  .paragraph-summary {
+    font-size: 12px;
+  }
+}
