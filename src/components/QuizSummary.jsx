@@ -18,9 +18,15 @@ const QuizSummary = () => {
 
   const [showDetails, setShowDetails] = useState(false);
 
+  const elapsedMinutes = Math.floor(quizState.elapsedTime / 60000);
+  const elapsedSeconds = Math.floor((quizState.elapsedTime % 60000) / 1000);
+
   return (
     <div className="summary-container">
       <h1>Quiz Summary</h1>
+      <p>
+        Time taken: {elapsedMinutes} minutes and {elapsedSeconds} seconds
+      </p>
       <p style={{ fontWeight: "bold", textDecoration: "underline" }}>
         Score: {quizState.score}
       </p>
@@ -39,11 +45,12 @@ const QuizSummary = () => {
               <p>
                 Question: {answer.question.questionText}
                 <br />
-                Your Answer: {answer.answer}
+                Your Answer:{" "}
+                <span style={{ color: "lightcoral" }}>{answer.answer}</span>
                 <br />
                 <span className="incorrect-answer">
                   Correct Answer:{" "}
-                  {answer.question.options[answer.question.correctAnswerIndex]}
+                  <span  style={{ color: "lightgreen" }}>{answer.question.options[answer.question.correctAnswerIndex]}</span>
                 </span>
               </p>
             </div>

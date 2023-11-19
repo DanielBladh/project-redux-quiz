@@ -22,18 +22,6 @@ const techTriviaQuestions = [
   },
   {
     id: 3,
-    questionText:
-      "What does the following JavaScript code do?\n\n```javascript\nconst add = (a, b) => a + b;\nconsole.log(add(2, 3));\n```",
-    options: [
-      "Multiplies two numbers",
-      "Divides two numbers",
-      "Subtracts two numbers",
-      "Adds two numbers",
-    ],
-    correctAnswerIndex: 3,
-  },
-  {
-    id: 4,
     questionText: "Which tech company was founded by this person?",
     imageURL: jeffBezosImage,
     options: ["Apple", "Google", "Microsoft", "Amazon"],
@@ -41,7 +29,7 @@ const techTriviaQuestions = [
     correctAnswerIndex: 3,
   },
   {
-    id: 5,
+    id: 4,
     questionText:
       "Which programming paradigm is characterized by dividing the program into small, reusable parts called objects?",
     options: [
@@ -53,40 +41,40 @@ const techTriviaQuestions = [
     correctAnswerIndex: 1,
   },
   {
-    id: 6,
+    id: 5,
     questionText:
       "What is the name of the version control system widely used in software development to track changes in source code?",
     options: ["Mercurial", "SVN", "Git", "Perforce"],
     correctAnswerIndex: 2,
   },
   {
-    id: 7,
+    id: 6,
     questionText:
       "Which popular front-end framework is developed by Facebook for building user interfaces?",
     options: ["Angular", "Vue.js", "React", "Ember.js"],
     correctAnswerIndex: 2,
   },
   {
-    id: 8,
+    id: 7,
     questionText:
       "What does the acronym 'URL' stand for in the context of web development?",
     options: [
-      "Uniform Resource Locator",
       "Universal Rendering Language",
       "User Rights Language",
       "Unified Reference Language",
+      "Uniform Resource Locator",
     ],
-    correctAnswerIndex: 0,
+    correctAnswerIndex: 3,
   },
   {
-    id: 9,
+    id: 8,
     questionText:
       "Who is the inventor of the World Wide Web (WWW) and the HTTP protocol?",
     options: ["Tim Berners-Lee", "Linus Torvalds", "Larry Page", "Sergey Brin"],
     correctAnswerIndex: 0,
   },
   {
-    id: 10,
+    id: 9,
     questionText: "In computer science, what does the acronym 'API' stand for?",
     options: [
       "Application Programming Interface",
@@ -105,6 +93,7 @@ const initialState = {
   quizOver: false,
   totalQuestions: techTriviaQuestions.length,
   score: 0,
+  timer: 0,
 };
 
 export const quiz = createSlice({
@@ -159,6 +148,38 @@ export const quiz = createSlice({
         totalQuestions: state.totalQuestions,
         quizOver: false,
       };
+    },
+
+    startTimer: (state) => {
+      state.timer = 0;
+
+      // Increment timer every second
+      state.timerInterval = setInterval(() => {
+        state.timer += 1;
+      }, 1000);
+    },
+
+    stopTimer: (state) => {
+      clearInterval(state.timerInterval);
+      state.timerInterval = null; // Set timerInterval to null after clearing the interval
+    },
+
+    startQuiz: (state) => {
+      return {
+        ...state,
+        quizStarted: true,
+        startTime: Date.now(), // Save the start time when the quiz starts
+      };
+    },
+
+    updateElapsedTime: (state) => {
+      if (state.startTime) {
+        return {
+          ...state,
+          elapsedTime: Date.now() - state.startTime, // Calculate elapsed time
+        };
+      }
+      return state;
     },
   },
 });

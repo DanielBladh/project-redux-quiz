@@ -1,8 +1,10 @@
+// Import the necessary modules and components
 import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { quiz } from "../reducers/quiz";
 import ProgressBar from "./ProgressBar";
 import QuizSummary from "./QuizSummary";
+import WelcomePage from "./WelcomePage";
 import "./CurrentQuestion.css";
 
 export const CurrentQuestion = () => {
@@ -32,6 +34,18 @@ export const CurrentQuestion = () => {
     }
   }, [feedbackStyle, dispatch]);
 
+  useEffect(() => {
+    if (quizState.quizStarted && !quizState.quizOver) {
+      // Dispatch an action to update elapsed time every second
+      const intervalId = setInterval(() => {
+        dispatch(quiz.actions.updateElapsedTime());
+      }, 1000);
+
+      // Clear the interval when the component unmounts or the quiz is over
+      return () => clearInterval(intervalId);
+    }
+  }, [dispatch, quizState.quizStarted, quizState.quizOver]);
+
   const handleAnswerSubmit = () => {
     if (selectedOption !== null) {
       const isCorrect = selectedOption === question.correctAnswerIndex;
@@ -56,107 +70,113 @@ export const CurrentQuestion = () => {
 
   return (
     <div>
-      {quizState.quizOver ? (
-        (console.log("Quiz Over"), (<QuizSummary />))
-      ) : (
-        <div className="container">
-          {quizState.score <= -3 ? (
-            <div className="quiz-over-message">
-              <p>
-                Oops! Your score is too low to continue. Trivia can be tricky,
-                but it's an opportunity to learn and improve. Review the
-                questions, and when you're ready, click the button below to
-                restart the quiz and give it another shot. You've got this!
-              </p>
-              <button
-                className="restart-button"
-                onClick={() => dispatch(quiz.actions.restart())}
-              >
-                Restart Quiz
-              </button>
-            </div>
-          ) : (
-            <>
-              <ProgressBar
-                currentQuestionIndex={quizState.currentQuestionIndex}
-                totalQuestions={quizState.totalQuestions}
-              />
-              <h2>
-                Question {quizState.currentQuestionIndex + 1}/
-                {quizState.totalQuestions}
-              </h2>
-              <h1>Question: {question?.questionText}</h1>
-              {question?.imageURL && (
-                <img
-                  src={question.imageURL}
-                  alt="Jeff Bezos"
-                  className="founder-image"
-                />
-              )}
-              <form>
-                {question?.options?.map((option, index) => (
-                  <div
-                    key={index}
-                    className={`option ${
-                      feedbackStyle === "correct" &&
-                      index === question.correctAnswerIndex
-                        ? "correct"
-                        : feedbackStyle === "incorrect"
-                        ? index === selectedOption
-                          ? "incorrect"
-                          : ""
-                        : ""
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      id={`option${index}`}
-                      name="answerOption"
-                      value={index}
-                      checked={selectedOption === index}
-                      onChange={() => setSelectedOption(index)}
-                      disabled={feedbackStyle !== null}
-                    />
-                    <label
-                      htmlFor={`option${index}`}
-                      className="label-with-image"
-                    >
-                      {question?.logoURLs && (
-                        <img
-                          src={question.logoURLs[index]}
-                          alt={`Logo for ${option}`}
-                          className="company-logo"
-                        />
-                      )}
-                      {option}
-                    </label>
-                  </div>
-                ))}
-              </form>
-              {feedbackStyle && (
-                <p className={`feedback ${feedbackStyle}`}>
-                  Your answer was{" "}
-                  {feedbackStyle === "correct" ? "correct!" : "incorrect."} The
-                  correct answer was:{" "}
-                  <span style={{ backgroundColor: "lightgreen" }}>
-                    {question?.options[question.correctAnswerIndex]}.
-                  </span>
+      {quizState.quizStarted ? ( // Check if the quiz has started
+        quizState.quizOver ? (
+          (console.log("Quiz Over"), (<QuizSummary />))
+        ) : (
+          <div className="container">
+            {quizState.score <= -3 ? (
+              <div className="quiz-over-message">
+                <p>
+                  Oops! Your score is too low to continue. Trivia can be tricky,
+                  but it's an opportunity to learn and improve. Review the
+                  questions, and when you're ready, click the button below to
+                  restart the quiz and give it another shot. You've got this!
                 </p>
-              )}
-              {!feedbackStyle && (
-                <div className="button-container">
-                  <button
-                    className="button"
-                    onClick={handleAnswerSubmit}
-                    disabled={selectedOption === null || feedbackStyle !== null}
-                  >
-                    Submit and Next Question
-                  </button>
-                </div>
-              )}
-            </>
-          )}
-        </div>
+                <button
+                  className="restart-button"
+                  onClick={() => dispatch(quiz.actions.restart())}
+                >
+                  Restart Quiz
+                </button>
+              </div>
+            ) : (
+              <>
+                <ProgressBar
+                  currentQuestionIndex={quizState.currentQuestionIndex}
+                  totalQuestions={quizState.totalQuestions}
+                />
+                <h2>
+                  Question {quizState.currentQuestionIndex + 1}/
+                  {quizState.totalQuestions}
+                </h2>
+                <h1>Question: {question?.questionText}</h1>
+                {question?.imageURL && (
+                  <img
+                    src={question.imageURL}
+                    alt="Jeff Bezos"
+                    className="founder-image"
+                  />
+                )}
+                <form>
+                  {question?.options?.map((option, index) => (
+                    <div
+                      key={index}
+                      className={`option ${
+                        feedbackStyle === "correct" &&
+                        index === question.correctAnswerIndex
+                          ? "correct"
+                          : feedbackStyle === "incorrect"
+                          ? index === selectedOption
+                            ? "incorrect"
+                            : ""
+                          : ""
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        id={`option${index}`}
+                        name="answerOption"
+                        value={index}
+                        checked={selectedOption === index}
+                        onChange={() => setSelectedOption(index)}
+                        disabled={feedbackStyle !== null}
+                      />
+                      <label
+                        htmlFor={`option${index}`}
+                        className="label-with-image"
+                      >
+                        {question?.logoURLs && (
+                          <img
+                            src={question.logoURLs[index]}
+                            alt={`Logo for ${option}`}
+                            className="company-logo"
+                          />
+                        )}
+                        {option}
+                      </label>
+                    </div>
+                  ))}
+                </form>
+                {feedbackStyle && (
+                  <p className={`feedback ${feedbackStyle}`}>
+                    Your answer was{" "}
+                    {feedbackStyle === "correct" ? "correct!" : "incorrect."}{" "}
+                    The correct answer was:{" "}
+                    <span style={{ backgroundColor: "lightgreen" }}>
+                      {question?.options[question.correctAnswerIndex]}.
+                    </span>
+                  </p>
+                )}
+                {!feedbackStyle && (
+                  <div className="button-container">
+                    <button
+                      className="button"
+                      onClick={handleAnswerSubmit}
+                      disabled={
+                        selectedOption === null || feedbackStyle !== null
+                      }
+                    >
+                      Submit and Next Question
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )
+      ) : (
+        <WelcomePage />
       )}
     </div>
   );
